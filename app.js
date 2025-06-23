@@ -143,14 +143,17 @@ translateBtn.addEventListener("click", async () => {
 
       const data = await response.json();
 
+      const safeSentence = sentence ? sentence.replace(/'/g, "\\'") : "";
+      const safeTranslatedText = data.translatedText ? data.translatedText.replace(/'/g, "\\'") : "";
+
       html += `
         <div class="card mb-2">
           <div class="card-body">
             <p><strong>中文：</strong> ${sentence}</p>
-            <button class="btn btn-sm btn-outline-primary me-2" onclick="speak('${sentence.replace(/'/g, "\\'")}', 'zh-TW')">🔊 播放中文</button>
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="speak('${safeSentence}', 'zh-TW')">🔊 播放中文</button>
             <hr />
-            <p><strong>翻譯：</strong> ${data.translatedText}</p>
-            <button class="btn btn-sm btn-outline-success" onclick="speak('${data.translatedText.replace(/'/g, "\\'")}', getLangCode('${targetLang}'))">🔊 播放翻譯</button>
+            <p><strong>翻譯：</strong> ${data.translatedText || ""}</p>
+            <button class="btn btn-sm btn-outline-success" onclick="speak('${safeTranslatedText}', getLangCode('${targetLang}'))">🔊 播放翻譯</button>
           </div>
         </div>
       `;
@@ -160,6 +163,7 @@ translateBtn.addEventListener("click", async () => {
   }
   translationResults.innerHTML = html;
 });
+
 
 // 語音播放
 function speak(text, lang) {
