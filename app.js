@@ -241,7 +241,7 @@ async function translateText(text, targetLang) {
 
 // 翻譯按鈕事件
 // document.getElementById("translateBtn").addEventListener("click", async () => {
-//   const text = document.getElementById("resultText").innerText.trim();
+//   const text = document.getElementById("resultText").innerText.trim();   
 //   const targetLang = document.getElementById("langSelect").value;
 
 //   if (!text) {
