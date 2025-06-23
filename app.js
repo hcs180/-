@@ -130,7 +130,7 @@ translateBtn.addEventListener("click", async () => {
     if (!sentence.trim()) continue;
 
     try {
-      const response = await fetch("https://libretranslate.de/translate", {
+      const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -212,7 +212,7 @@ function speak(text, lang) {
 async function translateText(text, targetLang) {
   if (!text) return "";
   try {
-    const response = await fetch("https://libretranslate.de/translate", {
+    const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
