@@ -240,14 +240,14 @@ async function translateText(text, targetLang) {
 }
 
 // 翻譯按鈕事件
-document.getElementById("translateBtn").addEventListener("click", async () => {
-  const text = document.getElementById("resultText").innerText.trim();
-  const targetLang = document.getElementById("langSelect").value;
+// document.getElementById("translateBtn").addEventListener("click", async () => {
+//   const text = document.getElementById("resultText").innerText.trim();
+//   const targetLang = document.getElementById("langSelect").value;
 
-  if (!text) {
-    alert("請先錄音並轉換成文字");
-    return;
-  }
+//   if (!text) {
+//     alert("請先錄音並轉換成文字");
+//     return;
+//   }
 
   // 可自行拆句，這裡簡化直接翻譯全文
   const translated = await translateText(text, targetLang);
@@ -259,7 +259,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
       <div class="card-body">
         <p><strong>原文：</strong> ${text}</p>
         <p><strong>翻譯：</strong> ${translated}</p>
-        <button class="btn btn-outline-success" onclick="speak('${translated.replace(/'/g, "\\'")}', getLangCode('${targetLang}'))">🔊 播放翻譯</button>
+        <button class="btn btn-outline-success" onclick="speak('${(translated || '').replace(/'/g, \"\\\\'\")}', getLangCode('${targetLang}'))">🔊 播放翻譯</button>
       </div>
     </div>
   `;
