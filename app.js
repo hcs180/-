@@ -265,5 +265,3 @@ translateBtn.addEventListener("click", async () => {
   `;
 });
 
-});
-
