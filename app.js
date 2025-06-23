@@ -1,4 +1,5 @@
 const startBtn = document.getElementById("startBtn");
+const continueBtn = document.getElementById("continueBtn");
 const stopBtn = document.getElementById("stopBtn");
 const resultText = document.getElementById("resultText");
 const statusText = document.getElementById("statusText");
@@ -16,7 +17,6 @@ fontSizeSelect.addEventListener("change", () => {
   resultText.style.fontSize = fontSizeSelect.value;
 });
 
-// 取得麥克風列表
 async function listMicrophones() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -41,25 +41,39 @@ micSelect.addEventListener("change", () => {
   selectedDeviceId = micSelect.value;
 });
 
-// 開始錄音
 startBtn.addEventListener("click", async () => {
+  if (!selectedDeviceId) {
+    alert("請先選擇麥克風");
+    return;
+  }
+  finalTranscript = "";
+  resultText.value = "";
+  startRecognition();
+});
+
+continueBtn.addEventListener("click", async () => {
+  if (!selectedDeviceId) {
+    alert("請先選擇麥克風");
+    return;
+  }
+  startRecognition();
+});
+
+stopBtn.addEventListener("click", () => {
+  if (recognition) recognition.stop();
+});
+
+async function startRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     alert("瀏覽器不支援語音辨識，請使用 Chrome");
     return;
   }
 
-  if (!selectedDeviceId) {
-    alert("請先選擇麥克風");
-    return;
-  }
-
-  // 取得指定麥克風音源
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: { deviceId: { exact: selectedDeviceId } },
     });
-    // 停止流避免雜音，因Web Speech API直接開啟麥克風
     stream.getTracks().forEach(track => track.stop());
   } catch (err) {
     alert("無法存取麥克風：" + err.message);
@@ -71,8 +85,6 @@ startBtn.addEventListener("click", async () => {
   recognition.continuous = true;
   recognition.interimResults = true;
 
-  finalTranscript = "";
-  resultText.innerText = "";
   statusText.innerText = "🎙️ 錄音中，請開始說話...";
   statusText.className = "text-danger";
 
@@ -93,6 +105,7 @@ startBtn.addEventListener("click", async () => {
     statusText.innerText = "❌ 語音辨識錯誤：" + event.error;
     statusText.className = "text-danger";
     startBtn.disabled = false;
+    continueBtn.disabled = false;
     stopBtn.disabled = true;
   };
 
@@ -100,23 +113,76 @@ startBtn.addEventListener("click", async () => {
     statusText.innerText = "🛑 停止錄音";
     statusText.className = "text-muted";
     startBtn.disabled = false;
+    continueBtn.disabled = false;
     stopBtn.disabled = true;
   };
 
   recognition.start();
   startBtn.disabled = true;
+  continueBtn.disabled = true;
   stopBtn.disabled = false;
+}
+
+// 播放語音轉文字結果
+const playOriginalBtn = document.getElementById("playOriginalBtn");
+playOriginalBtn.addEventListener("click", () => {
+  const text = resultText.value.trim();
+  if (!text) {
+    alert("沒有可播放的文字");
+    return;
+  }
+  speak(text, "zh-TW");
 });
 
-// 停止錄音
-stopBtn.addEventListener("click", () => {
-  if (recognition) recognition.stop();
-});
+// 語音播放功能 (含語音選擇)
+function loadVoices() {
+  return new Promise((resolve) => {
+    let voices = speechSynthesis.getVoices();
+    if (voices.length) {
+      resolve(voices);
+      return;
+    }
+    speechSynthesis.onvoiceschanged = () => {
+      voices = speechSynthesis.getVoices();
+      resolve(voices);
+    };
+  });
+}
+
+async function speak(text, lang) {
+  if (!window.speechSynthesis) {
+    alert("此瀏覽器不支援語音合成");
+    return;
+  }
+  const voices = await loadVoices();
+  let voice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase());
+  if (!voice) {
+    voice = voices.find(v => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+  }
+  if (!voice) voice = voices[0];
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = voice;
+  utterance.lang = lang;
+  speechSynthesis.speak(utterance);
+}
+
+// 取得語言代碼對應
+function getLangCode(lang) {
+  const map = {
+    en: "en-US",
+    ko: "ko-KR",
+    ja: "ja-JP",
+    id: "id-ID",
+    vi: "vi-VN",
+    tl: "tl-PH",
+  };
+  return map[lang] || "en-US";
+}
 
 // 翻譯功能
 translateBtn.addEventListener("click", async () => {
   const targetLang = langSelect.value;
-  const text = resultText.innerText.trim();
+  const text = resultText.value.trim();
   if (!text) {
     alert("請先錄音並轉成文字");
     return;
@@ -164,171 +230,9 @@ translateBtn.addEventListener("click", async () => {
   translationResults.innerHTML = html;
 });
 
-
-// 語音播放
-function loadVoices() {
-  return new Promise((resolve) => {
-    let voices = speechSynthesis.getVoices();
-    if (voices.length) {
-      resolve(voices);
-      return;
-    }
-    speechSynthesis.onvoiceschanged = () => {
-      voices = speechSynthesis.getVoices();
-      resolve(voices);
-    };
-  });
-}
-
-async function speak(text, lang) {
-  if (!window.speechSynthesis) {
-    alert("此瀏覽器不支援語音合成");
-    return;
-  }
-  const voices = await loadVoices();
-  // 找完全匹配的語言代碼
-  let voice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase());
-  // 找不到就找前兩碼相符的語音
-  if (!voice) {
-    voice = voices.find(v => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
-  }
-  // 找不到就用第一個
-  if (!voice) voice = voices[0];
-  
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.voice = voice;
-  utterance.lang = lang;
-  speechSynthesis.speak(utterance);
-}
-
-
-// 取得語言代碼對應
-function getLangCode(lang) {
-  const map = {
-    en: "en-US",
-    ko: "ko-KR",
-    ja: "ja-JP",
-    id: "id-ID",
-    vi: "vi-VN",
-    tl: "tl-PH",
-  };
-  return map[lang] || "en-US";
-}
-
-// 頁面載入列出麥克風
+// 頁面載入時列出麥克風列表
 navigator.mediaDevices.getUserMedia({ audio: true })
   .then(listMicrophones)
   .catch(err => {
     alert("無法取得麥克風：" + err.message);
   });
-const playOriginalBtn = document.getElementById("playOriginalBtn");
-
-// 播放語音轉文字結果
-playOriginalBtn.addEventListener("click", () => {
-  const text = resultText.value.trim();
-  if (!text) {
-    alert("沒有可播放的文字");
-    return;
-  }
-  speak(text, "zh-TW");
-});
-
-// 修改 speak 函式：保留，無需改動
-function speak(text, lang) {
-  if (!window.speechSynthesis) {
-    alert("此瀏覽器不支援語音合成");
-    return;
-  }
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  speechSynthesis.speak(utterance);
-}
-
-// 呼叫 LibreTranslate API 的函式
-async function translateText(text, targetLang) {
-  if (!text) return "";
-  try {
-    const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: text,
-        source: "zh",
-        target: targetLang,
-        format: "text",
-      }),
-    });
-
-    if (!response.ok) throw new Error(`API錯誤，狀態碼 ${response.status}`);
-
-    const data = await response.json();
-    return data.translatedText;
-  } catch (error) {
-    console.error("翻譯錯誤", error);
-    alert("翻譯失敗，請稍後再試");
-    return "";
-  }
-  
-}
-
-// 翻譯按鈕事件
-// 在產生翻譯結果的 HTML 時，按鈕不直接寫 onclick
-translateBtn.addEventListener("click", async () => {
-  const targetLang = langSelect.value;
-  const text = resultText.value.trim();
-  if (!text) {
-    alert("請先錄音並轉成文字");
-    return;
-  }
-
-  const sentences = text.split(/(?<=[。！？…])/);
-  translationResults.innerHTML = '<div class="text-muted">翻譯中，請稍候...</div>';
-
-  let html = "";
-  for (const sentence of sentences) {
-    if (!sentence.trim()) continue;
-
-    try {
-      const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          q: sentence,
-          source: "zh",
-          target: targetLang,
-          format: "text",
-        }),
-      });
-
-      const data = await response.json();
-
-      // 使用 encodeURIComponent 編碼，安全放到 data-* 屬性
-      const encodedSentence = encodeURIComponent(sentence);
-      const encodedTranslation = encodeURIComponent(data.translatedText || "");
-
-      html += `
-        <div class="card mb-2">
-          <div class="card-body">
-            <p><strong>中文：</strong> ${sentence}</p>
-            <button class="btn btn-sm btn-outline-primary me-2 play-btn" data-text="${encodedSentence}" data-lang="zh-TW">🔊 播放中文</button>
-            <hr />
-            <p><strong>翻譯：</strong> ${data.translatedText || ""}</p>
-            <button class="btn btn-sm btn-outline-success play-btn" data-text="${encodedTranslation}" data-lang="${targetLang}">🔊 播放翻譯</button>
-          </div>
-        </div>
-      `;
-    } catch (e) {
-      html += `<p class="text-danger">翻譯失敗：${e.message}</p>`;
-    }
-  }
-  translationResults.innerHTML = html;
-});
-
-// 事件委派監聽所有播放按鈕
-translationResults.addEventListener("click", (e) => {
-  if (e.target.classList.contains("play-btn")) {
-    const text = decodeURIComponent(e.target.getAttribute("data-text"));
-    const lang = e.target.getAttribute("data-lang");
-    speak(text, getLangCode(lang));
-  }
-});
