@@ -176,6 +176,8 @@ function speak(text, lang) {
 function getLangCode(lang) {
   const map = {
     en: "en-US",
+    ko: "ko-KR",
+    ja: "ja-JP",
     id: "id-ID",
     vi: "vi-VN",
     tl: "tl-PH",
