@@ -241,45 +241,58 @@ async function translateText(text, targetLang) {
 
 // 翻譯按鈕事件
 // 在產生翻譯結果的 HTML 時，按鈕不直接寫 onclick
-let html = "";
-for (const sentence of sentences) {
-  if (!sentence.trim()) continue;
-
-  try {
-    const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: sentence,
-        source: "zh",
-        target: targetLang,
-        format: "text",
-      }),
-    });
-    const data = await response.json();
-
-    // 用 encodeURIComponent 編碼字串，安全放在 data-* 屬性
-    const encodedSentence = encodeURIComponent(sentence);
-    const encodedTranslation = encodeURIComponent(data.translatedText || "");
-
-    html += `
-      <div class="card mb-2">
-        <div class="card-body">
-          <p><strong>中文：</strong> ${sentence}</p>
-          <button class="btn btn-sm btn-outline-primary me-2 play-btn" data-text="${encodedSentence}" data-lang="zh-TW">🔊 播放中文</button>
-          <hr />
-          <p><strong>翻譯：</strong> ${data.translatedText || ""}</p>
-          <button class="btn btn-sm btn-outline-success play-btn" data-text="${encodedTranslation}" data-lang="${targetLang}">🔊 播放翻譯</button>
-        </div>
-      </div>
-    `;
-  } catch (e) {
-    html += `<p class="text-danger">翻譯失敗：${e.message}</p>`;
+translateBtn.addEventListener("click", async () => {
+  const targetLang = langSelect.value;
+  const text = resultText.innerText.trim();
+  if (!text) {
+    alert("請先錄音並轉成文字");
+    return;
   }
-}
-translationResults.innerHTML = html;
 
-// 事件委派監聽播放按鈕
+  const sentences = text.split(/(?<=[。！？…])/);
+  translationResults.innerHTML = '<div class="text-muted">翻譯中，請稍候...</div>';
+
+  let html = "";
+  for (const sentence of sentences) {
+    if (!sentence.trim()) continue;
+
+    try {
+      const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          q: sentence,
+          source: "zh",
+          target: targetLang,
+          format: "text",
+        }),
+      });
+
+      const data = await response.json();
+
+      // 使用 encodeURIComponent 編碼，安全放到 data-* 屬性
+      const encodedSentence = encodeURIComponent(sentence);
+      const encodedTranslation = encodeURIComponent(data.translatedText || "");
+
+      html += `
+        <div class="card mb-2">
+          <div class="card-body">
+            <p><strong>中文：</strong> ${sentence}</p>
+            <button class="btn btn-sm btn-outline-primary me-2 play-btn" data-text="${encodedSentence}" data-lang="zh-TW">🔊 播放中文</button>
+            <hr />
+            <p><strong>翻譯：</strong> ${data.translatedText || ""}</p>
+            <button class="btn btn-sm btn-outline-success play-btn" data-text="${encodedTranslation}" data-lang="${targetLang}">🔊 播放翻譯</button>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      html += `<p class="text-danger">翻譯失敗：${e.message}</p>`;
+    }
+  }
+  translationResults.innerHTML = html;
+});
+
+// 事件委派監聽所有播放按鈕
 translationResults.addEventListener("click", (e) => {
   if (e.target.classList.contains("play-btn")) {
     const text = decodeURIComponent(e.target.getAttribute("data-text"));
@@ -287,5 +300,6 @@ translationResults.addEventListener("click", (e) => {
     speak(text, getLangCode(lang));
   }
 });
+
 
 
