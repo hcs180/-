@@ -1,63 +1,54 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>語音辨識系統</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>凱蒂語音幫手</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- 你的 CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="p-4 bg-light">
+<body>
+  <header>
+    <h1><img src="kitty-bow.png" alt="Hello Kitty 蝴蝶結" class="logo-icon" /> Kitty小幫手</h1>
+  </header>
 
-  <h2>瑞珍的語音轉文字與翻譯系統</h2>
+  <main>
+    <textarea id="resultText" placeholder="語音轉文字結果..." rows="8"></textarea>
 
-  <div class="mb-2">
-    <label for="micSelect" class="form-label">選擇麥克風</label>
-    <select id="micSelect" class="form-select"></select>
-  </div>
+    <div class="controls">
+      <button id="startBtn" class="btn record-btn"><i class="fas fa-microphone"></i> 開始錄音</button>
+      <button id="continueBtn" class="btn continue-btn"><i class="fas fa-microphone-alt"></i> 繼續錄音</button>
+      <button id="stopBtn" class="btn stop-btn"><i class="fas fa-stop"></i> 停止錄音</button>
+      <button id="playOriginalBtn" class="btn play-btn"><i class="fas fa-play"></i> 播放文字</button>
+      <button id="translateBtn" class="btn translate-btn"><i class="fas fa-language"></i> 翻譯</button>
+      <select id="fontSizeSelect" class="font-size-select" title="調整文字大小">
+          <option value="40px">40px</option>
+          <option value="45px">45px</option>
+          <option value="50px">50px</option>
+          <option value="55px">55px</option>
+          <option value="60px">60px</option>
+          <option value="65px">65px</option>
+          <option value="70px">70px</option>
+      </select>
 
-  <div class="mb-2">
-    <button id="startBtn" class="btn btn-primary me-2">開始錄音(清空文字)</button>
-    <button id="continueBtn" class="btn btn-secondary me-2">繼續錄音(保留文字)</button>
-    <button id="stopBtn" class="btn btn-danger" disabled>停止錄音</button>
-  </div>
+      <select id="langSelect" class="language-select">
+        <option value="en">英文</option>
+        <option value="ko">韓文</option>
+        <option value="ja">日文</option>
+        <option value="id">印尼文</option>
+        <option value="vi">越南文</option>
+        <option value="tl">菲律賓語</option>
+      </select>
+      
+      <select id="micSelect" class="mic-select"></select>
+    </div>
 
-  <div class="mb-3">
-    <label for="resultText" class="form-label">語音轉文字結果</label>
-    <textarea id="resultText" class="form-control" rows="5" placeholder="語音轉文字結果會顯示在這裡" style="font-size: 24px;"></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label for="fontSizeSelect" class="form-label">文字大小</label>
-    <select id="fontSizeSelect" class="form-select w-auto">
-      <option value="28px">28px</option>
-      <option value="32px" selected>32px</option>
-      <option value="36px">36px</option>
-      <option value="40px">40px</option>
-      <option value="44px">44px</option>
-      <option value="48px">48px</option>
-      <option value="66px">66px</option>
-      <option value="66px">88px</option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label for="langSelect" class="form-label">翻譯語言</label>
-    <select id="langSelect" class="form-select w-auto">
-      <option value="en">英文</option>
-      <option value="ko">韓文</option>
-      <option value="ja">日文</option>
-      <option value="id">印尼文</option>
-      <option value="vi">越南文</option>
-      <option value="tl">菲律賓語</option>
-    </select>
-    <button id="translateBtn" class="btn btn-success ms-2 mt-3 .d-flex justify-content-center">翻譯</button>
-  </div>
-
-  <div id="translationResults"></div>
-
-  <p id="statusText" class="text-muted mt-3"></p>
-
-  <button id="playOriginalBtn" class="btn btn-outline-primary mt-3">播放語音轉文字結果</button>
+    <div id="translationResults" class="translation-results"></div>
+  </main>
 
   <script src="app.js"></script>
 </body>
