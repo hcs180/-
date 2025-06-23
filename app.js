@@ -240,28 +240,52 @@ async function translateText(text, targetLang) {
 }
 
 // 翻譯按鈕事件
-translateBtn.addEventListener("click", async () => {
-  const text = document.getElementById("resultText").innerText.trim();   
-  const targetLang = document.getElementById("langSelect").value;
+// 在產生翻譯結果的 HTML 時，按鈕不直接寫 onclick
+let html = "";
+for (const sentence of sentences) {
+  if (!sentence.trim()) continue;
 
-  if (!text) {
-    alert("請先錄音並轉換成文字");
-    return;
-  }
+  try {
+    const response = await fetch("https://secret-dusk-49002-0a1ad6459a8f.herokuapp.com/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        q: sentence,
+        source: "zh",
+        target: targetLang,
+        format: "text",
+      }),
+    });
+    const data = await response.json();
 
-  // 可自行拆句，這裡簡化直接翻譯全文
-  const translated = await translateText(text, targetLang);
+    // 用 encodeURIComponent 編碼字串，安全放在 data-* 屬性
+    const encodedSentence = encodeURIComponent(sentence);
+    const encodedTranslation = encodeURIComponent(data.translatedText || "");
 
-  // 顯示翻譯結果（可改為逐句顯示）
-  const translationResults = document.getElementById("translationResults");
-  translationResults.innerHTML = `
-    <div class="card">
-      <div class="card-body">
-        <p><strong>原文：</strong> ${text}</p>
-        <p><strong>翻譯：</strong> ${translated}</p>
-        <button class="btn btn-outline-success" onclick="speak('${(translated || '').replace(/'/g, \"\\\\'\")}', getLangCode('${targetLang}'))">🔊 播放翻譯</button>
+    html += `
+      <div class="card mb-2">
+        <div class="card-body">
+          <p><strong>中文：</strong> ${sentence}</p>
+          <button class="btn btn-sm btn-outline-primary me-2 play-btn" data-text="${encodedSentence}" data-lang="zh-TW">🔊 播放中文</button>
+          <hr />
+          <p><strong>翻譯：</strong> ${data.translatedText || ""}</p>
+          <button class="btn btn-sm btn-outline-success play-btn" data-text="${encodedTranslation}" data-lang="${targetLang}">🔊 播放翻譯</button>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  } catch (e) {
+    html += `<p class="text-danger">翻譯失敗：${e.message}</p>`;
+  }
+}
+translationResults.innerHTML = html;
+
+// 事件委派監聽播放按鈕
+translationResults.addEventListener("click", (e) => {
+  if (e.target.classList.contains("play-btn")) {
+    const text = decodeURIComponent(e.target.getAttribute("data-text"));
+    const lang = e.target.getAttribute("data-lang");
+    speak(text, getLangCode(lang));
+  }
 });
+
 
