@@ -86,7 +86,7 @@ startBtn.addEventListener("click", async () => {
         interimTranscript += transcript;
       }
     }
-    resultText.innerText = finalTranscript + interimTranscript;
+    resultText.value = finalTranscript + interimTranscript;
   };
 
   recognition.onerror = (event) => {
@@ -225,7 +225,7 @@ const playOriginalBtn = document.getElementById("playOriginalBtn");
 
 // 播放語音轉文字結果
 playOriginalBtn.addEventListener("click", () => {
-  const text = resultText.innerText.trim();
+  const text = resultText.value.trim();
   if (!text) {
     alert("沒有可播放的文字");
     return;
@@ -275,7 +275,7 @@ async function translateText(text, targetLang) {
 // 在產生翻譯結果的 HTML 時，按鈕不直接寫 onclick
 translateBtn.addEventListener("click", async () => {
   const targetLang = langSelect.value;
-  const text = resultText.innerText.trim();
+  const text = resultText.value.trim();
   if (!text) {
     alert("請先錄音並轉成文字");
     return;
