@@ -1,8 +1,271 @@
-body {
-  background-color: #f8f9fa;
+/* 基本重置與字體設定 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-#inputTextContainer {
-  min-height: 80px;
-  font-family: "Microsoft JhengHei", sans-serif;
+
+
+
+body {
+  background: url("kitty-bg.png") no-repeat center center fixed;
+  background-size: cover;
+  background-color: #FDEFF2;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #FDEFF2; /* 淡粉紅背景 */
+  font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+  color: #333;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* 頁首 Header */
+header {
+  background-color: #F7A6B3;
+  padding: 1.5rem 0;
+  text-align: center;
+  color: #FFF;
+  box-shadow: 0 3px 8px rgba(231, 84, 128, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 2px rgba(255 255 255 / 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-icon {
+  height: 1.5em;
+  margin-right: 0.5em;
+  filter: drop-shadow(0 0 1px #fff);
+}
+
+/* 主要內容 Main */
+main {
+  max-width: 800px;
+  margin: 2.5rem auto 3rem auto;
+  padding: 0 1rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(247, 166, 179, 0.3);
+}
+
+/* 語音文字輸入區域 */
+textarea#resultText {
+  width: 100%;
+  height: 180px;
+  padding: 1rem 1.2rem;
+  font-size: 20px;
+  font-size: 1.1rem;
+  border-radius: 14px;
+  border: 2px solid #F3E0D3;
+  background-color: #FFF0F6;
+  resize: vertical;
+  font-weight: 500;
+  color: #4B2B30;
+  box-shadow: inset 0 2px 6px rgba(247, 166, 179, 0.15);
+  transition: border-color 0.3s ease;
+  outline-offset: 2px;
+  outline-color: #F7A6B3;
+}
+
+textarea#resultText:focus {
+  border-color: #E75480;
+  box-shadow: 0 0 8px #F7A6B3;
+  outline: none;
+}
+
+/* 控制按鈕區域 */
+.controls {
+  margin: 0.1rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+}
+
+.font-size-select {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1.5px solid #F3E0D3;
+  background-color: #FFF0F6;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4B2B30;
+  box-shadow: inset 0 2px 4px rgba(247, 166, 179, 0.25);
+  user-select: none;
+  min-width: 120px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  margin-left: 0.5rem;
+}
+
+.font-size-select:hover,
+.font-size-select:focus {
+  border-color: #E75480;
+  outline: none;
+  box-shadow: 0 0 6px #F7A6B3;
+}
+
+/* 按鈕通用樣式 */
+button.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #F7A6B3;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(247, 166, 179, 0.45);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+button.btn:hover:not(:disabled) {
+  background-color: #E75480;
+  box-shadow: 0 6px 15px rgba(231, 84, 128, 0.7);
+}
+
+button.btn:disabled {
+  background-color: #F7A6B3;
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 按鈕顏色分類 */
+button.record-btn {
+  background-color: #E75480;
+}
+
+button.record-btn:hover:not(:disabled) {
+  background-color: #d02552;
+}
+
+button.continue-btn {
+  background-color: #F5A8B4;
+  color: #4B2B30;
+}
+
+button.continue-btn:hover:not(:disabled) {
+  background-color: #E07E94;
+  color: #fff;
+}
+
+button.stop-btn {
+  background-color: #C44655;
+}
+
+button.stop-btn:hover:not(:disabled) {
+  background-color: #9B3241;
+}
+
+button.play-btn {
+  background-color: #D36178;
+}
+
+button.play-btn:hover:not(:disabled) {
+  background-color: #B84E62;
+}
+
+button.translate-btn {
+  background-color: #F89DB6;
+  color: #4B2B30;
+}
+
+button.translate-btn:hover:not(:disabled) {
+  background-color: #D7728D;
+  color: #fff;
+}
+
+/* 選單樣式 */
+select#langSelect,
+select#micSelect {
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  border: 1.5px solid #F3E0D3;
+  background-color: #FFF0F6;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4B2B30;
+  box-shadow: inset 0 2px 4px rgba(247, 166, 179, 0.25);
+  user-select: none;
+  min-width: 160px;
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+select#langSelect:hover,
+select#micSelect:hover,
+select#langSelect:focus,
+select#micSelect:focus {
+  border-color: #E75480;
+  outline: none;
+  box-shadow: 0 0 6px #F7A6B3;
+}
+
+/* 翻譯結果區 */
+
+#resultText {
+  margin: 2rem auto 0.01rem;
+}
+.translation-results {
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+}
+
+.card {
+  background-color: #FFF0F6;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(247, 166, 179, 0.3);
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  color: #4B2B30;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.card p {
+  margin: 0.5rem 0;
+}
+
+.card hr {
+  border: none;
+  border-top: 1.5px solid #F3E0D3;
+  margin: 0.8rem 0;
+}
+
+/* 響應式 */
+@media (max-width: 640px) {
+  .controls {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  button.btn,
+  select#langSelect,
+  select#micSelect {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* 小裝飾 */
