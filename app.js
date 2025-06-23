@@ -166,11 +166,41 @@ translateBtn.addEventListener("click", async () => {
 
 
 // 語音播放
-function speak(text, lang) {
+function loadVoices() {
+  return new Promise((resolve) => {
+    let voices = speechSynthesis.getVoices();
+    if (voices.length) {
+      resolve(voices);
+      return;
+    }
+    speechSynthesis.onvoiceschanged = () => {
+      voices = speechSynthesis.getVoices();
+      resolve(voices);
+    };
+  });
+}
+
+async function speak(text, lang) {
+  if (!window.speechSynthesis) {
+    alert("此瀏覽器不支援語音合成");
+    return;
+  }
+  const voices = await loadVoices();
+  // 找完全匹配的語言代碼
+  let voice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase());
+  // 找不到就找前兩碼相符的語音
+  if (!voice) {
+    voice = voices.find(v => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+  }
+  // 找不到就用第一個
+  if (!voice) voice = voices[0];
+  
   const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = voice;
   utterance.lang = lang;
   speechSynthesis.speak(utterance);
 }
+
 
 // 取得語言代碼對應
 function getLangCode(lang) {
@@ -302,6 +332,3 @@ translationResults.addEventListener("click", (e) => {
     speak(text, getLangCode(lang));
   }
 });
-
-
-
