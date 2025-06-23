@@ -240,14 +240,14 @@ async function translateText(text, targetLang) {
 }
 
 // 翻譯按鈕事件
-// document.getElementById("translateBtn").addEventListener("click", async () => {
-//   const text = document.getElementById("resultText").innerText.trim();   
-//   const targetLang = document.getElementById("langSelect").value;
+translateBtn.addEventListener("click", async () => {
+  const text = document.getElementById("resultText").innerText.trim();   
+  const targetLang = document.getElementById("langSelect").value;
 
-//   if (!text) {
-//     alert("請先錄音並轉換成文字");
-//     return;
-//   }
+  if (!text) {
+    alert("請先錄音並轉換成文字");
+    return;
+  }
 
   // 可自行拆句，這裡簡化直接翻譯全文
   const translated = await translateText(text, targetLang);
@@ -263,5 +263,7 @@ async function translateText(text, targetLang) {
       </div>
     </div>
   `;
+});
+
 });
 
